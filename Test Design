@@ -1,146 +1,112 @@
-# A/B Test Design: paymentChange
+# A/B Test: paymentChange
 
-## 1. Business Context
+## Case Description
 
-### 1.1 Problem Statement
-The product uses a freemium model. Users can access basic functionality for free, but the full value is unlocked through a paid subscription.
+You are a product analyst in a mobile app with a freemium model.  
+The product offers a subscription (price = 400) and one-time purchases.
 
-The current subscription price is 400. There is an assumption that this price may create a barrier for new users and reduce conversion into paid subscription.
+An experiment was conducted to reduce the subscription price from 400 to 160 for new users (50/50 split).
 
-### 1.2 Product Hypothesis
-If we reduce the subscription price from 400 to 160, conversion to paid subscription will increase, because the lower price reduces the entry barrier and makes the offer more attractive.
-
-### 1.3 Expected Business Impact
-The expected positive effect is growth in subscription conversion.
-
-At the same time, the experiment may negatively affect revenue metrics, since a lower price can reduce revenue per user even if more users convert.
-
-### 1.4 Economic Considerations
-The experiment should be evaluated not only through conversion growth, but also through business metrics such as ARPU.
-
-A strong increase in conversion does not automatically make the experiment successful if monetization deteriorates.
-
-### 1.5 Risks
-- technical issues with price display
-- incorrect logging of purchases
-- revenue loss due to lower subscription price
-- interaction with parallel experiments
-
-### 1.6 Limitations
-- experiment is conducted only on new users
-- results may be affected by seasonality
-- results may be limited by the observation window
-- threshold values should ideally be calibrated on historical data
-
-### 1.7 Why an A/B Test is Needed
-An A/B test is required because a price change directly affects user behavior and monetization, and the causal effect cannot be reliably estimated using simple before/after comparison.
-
-### 1.8 Experiment Type
-The experiment is randomized at the user level.
-Target audience: new users only.
-Parallel experiments must be checked to avoid interference.
-
-### 1.9 Business Success Criterion
-The experiment is considered successful if it increases subscription conversion without creating unacceptable risk for monetization metrics.
-
-### 1.10 Action Plan
-Possible outcomes:
-- positive effect on conversion with stable monetization → rollout
-- positive effect on conversion with monetization risk → extend analysis / additional test
-- no meaningful effect → do not rollout
+The goal is to evaluate the impact on conversion and revenue.
 
 ---
 
-## 2. Preparation
+## 1. Business Understanding
 
-### 2.1 Product Change Review
-Only the subscription price changes. The rest of the user experience should remain unchanged.
-
-### 2.2 Technical Implementation
-No new mechanics are required. The change affects only the displayed subscription price and the corresponding payment value.
-
-### 2.3 Logging Requirements
-The analysis requires:
-- user identifier
-- experiment assignment
-- payment type
-- payment amount
-- timestamps for actions and payments
-
----
-
-## 3. Split Design
-
-### 3.1 Target Segment
-Only new users are included in the experiment.
-
-### 3.2 Randomization
-Users are assigned to Control (Old) and Test (New) groups with a 50/50 split.
-
-### 3.3 Parallel Experiments
-Potential overlap with other experiments must be checked before interpreting the results.
-
-### 3.4 Cross-Group Integrity
-Each user must belong to only one group within the same experiment.
+| Checklist Item | Status | Comment |
+|----------------|--------|--------|
+| Problem defined | ✓ | High price may reduce conversion |
+| Hypothesis formulated | ✓ | Lower price → higher conversion |
+| Impact on key metric understood | ✓ | Expect strong conversion growth |
+| Economic impact considered | ✓ | Risk of ARPU decrease |
+| Risks identified | ✓ | Revenue loss, logging issues, parallel tests |
+| Limitations defined | ✓ | New users only, no historical calibration |
+| A/B test necessity justified | ✓ | Need causal inference |
+| Experiment type defined | ✓ | User-level randomization |
+| Success criteria defined | ✓ | Conversion growth without revenue damage |
+| Action plan defined | ✓ | Rollout / extend / reject |
 
 ---
 
-## 4. Metrics
+## 2. Experiment Design Validation
 
-### 4.1 Primary Metric
-Conversion to paid subscription.
-
-### 4.2 Guardrail Metrics
-- ARPU
-- ARPPU
-
-### 4.3 Informational Metrics
-- user activity / number of actions
-- engagement metrics
-
-### 4.4 Red Lines
-A material degradation in monetization metrics should trigger caution and require additional validation before rollout.
+| Checklist Item | Status | Comment |
+|----------------|--------|--------|
+| Group balance checked | ✓ | No imbalance detected |
+| SRM check | ✓ | No SRM |
+| Cross-group contamination | ✓ | ~0.003% overlap |
+| Parallel experiments impact | ✓ | Negligible |
 
 ---
 
-## 5. Statistical Design
+## 3. Metrics
 
-### 5.1 Statistical Tests
-- conversion → proportion z-test
-- ARPU → t-test
-
-### 5.2 Significance Level
-Alpha = 0.05
-
-### 5.3 Sample Ratio Mismatch Check
-The split must be validated to confirm that group allocation is consistent with the expected 50/50 design.
-
-### 5.4 Observation Window
-The conversion window must be taken into account so that users have enough time to convert.
-
-### 5.5 Novelty and Resistance Effects
-The change is mainly price-related, so novelty effects are expected to be limited, but user perception of the offer may still change.
-
-### 5.6 Peeking
-Interim checks must not affect the final decision unless stopping rules were defined in advance.
-
-### 5.7 Seasonality
-Seasonality and differences in user cohorts over time should be considered when interpreting the results.
-
-### 5.8 Outliers
-Revenue metrics should be checked for anomalies and skewness.
-
-### 5.9 Multiple Comparisons
-The main decision should rely on the primary metric and guardrails, while secondary metrics should be interpreted cautiously.
+| Metric Type | Metric | Description |
+|------------|--------|------------|
+| Primary | Conversion | Share of users who subscribed |
+| Guardrail | ARPU | Revenue per user |
+| Guardrail | ARPPU | Revenue per paying user |
+| Informational | Activity | User engagement |
 
 ---
 
-## 6. Validation Plan Before Analysis
+## 4. Results
 
-Before evaluating the experiment outcome, the following checks should be performed:
-- SRM
-- group balance
-- cross-group contamination
-- overlap with parallel experiments
-- consistency of payment values
-- user-level dataset construction
+### Conversion
+
+| Group | Value |
+|------|------|
+| Old | ~19.9% |
+| New | ~49.9% |
+
+Change: +30 p.p.  
+Statistical significance: YES (p < 0.05)
+
+---
+
+### ARPU
+
+| Group | Value |
+|------|------|
+| Old | ~309 |
+| New | ~225 |
+
+Change: -27%  
+Statistical significance: NO (p = 0.67)
+
+---
+
+## 5. Interpretation
+
+- Conversion significantly increased  
+- ARPU decreased in absolute terms  
+- However, ARPU difference is not statistically significant  
+
+This indicates a **trade-off between growth and monetization** with uncertainty in revenue impact.
+
+---
+
+## 6. Final Decision
+
+The experiment should **not be rolled out immediately**.
+
+Reason:
+- Strong positive effect on conversion  
+- Potential risk of revenue decline  
+- No statistical confirmation of ARPU drop  
+
+---
+
+## 7. Next Steps
+
+- Extend experiment duration  
+- Perform deeper analysis (LTV, segmentation)  
+- Validate ARPU impact  
+
+---
+
+## 8. Project Structure
+
+- `data/` — datasets  
+- `notebooks/` — analysis  
+- `docs/` — experiment design  
