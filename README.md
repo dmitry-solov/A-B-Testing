@@ -31,11 +31,4 @@ The goal of this project is to perform a full A/B test analysis cycle, including
 - `notebooks/ab_test_analysis.ipynb` — data analysis and statistical testing  
 - `data/` — datasets used in the analysis  
 
----
 
-## Key Focus Areas
-
-- conversion to subscription  
-- monetization (ARPU, ARPPU)  
-- trade-off between growth and revenue  
-- experiment validation (SRM, contamination, overlap)
