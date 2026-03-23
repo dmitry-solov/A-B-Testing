@@ -29,6 +29,6 @@ The goal of this project is to perform a full A/B test analysis cycle, including
 - `README.md` — case description and overview  
 - `docs/ab_test_design.md` — full experiment design  
 - `notebooks/ab_test_analysis.ipynb` — data analysis and statistical testing  
-- `data/` — datasets used in the analysis  
+
 
 
